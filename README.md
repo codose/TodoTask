@@ -1,8 +1,8 @@
-# Github Search
+# Todo Task
 ## Features 🎨
 
 - **100% Kotlin-only project**.
-- Coroutine, Jetpack compose, Hilt, Flow, AndroidX,MVVM.
+- Coroutine, Jetpack compose, Hilt, Flow, AndroidX, Room, MVVM.
 - 100% Gradle Kotlin DSL setup.
 - Dependency versions managed via `buildSrc`.
 - CI Setup with GitHub Actions.
