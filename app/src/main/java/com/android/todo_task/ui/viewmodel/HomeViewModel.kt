@@ -7,6 +7,7 @@ import com.android.todo_task.domain.usecase.*
 import com.android.todo_task.utils.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +20,8 @@ class HomeViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
-    private val todos = MutableStateFlow<List<TodoModel>>(listOf())
+    private val _todos = MutableStateFlow<List<TodoModel>>(listOf())
+    val todos = _todos.asStateFlow()
 
     init {
         getTodos()
@@ -28,7 +30,7 @@ class HomeViewModel @Inject constructor(
     private fun getTodos() {
         viewModelScope.launch(dispatchers.io) {
             getTodosUseCase.execute().collect {
-                todos.value = it
+                _todos.value = it
             }
         }
     }

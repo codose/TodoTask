@@ -11,6 +11,8 @@ class TodoEntityMapper @Inject constructor() : TodoMapper<TodoEntity, TodoModel>
         description = value.description,
         validFrom = value.validFrom,
         validTo = value.validTo,
+        status = value.status,
+        colorMap = value.colorMap,
         createdAt = value.createdAt,
         updatedAt = value.updatedAt
     )
@@ -21,6 +23,8 @@ class TodoEntityMapper @Inject constructor() : TodoMapper<TodoEntity, TodoModel>
         description = value.description,
         validFrom = value.validFrom,
         validTo = value.validTo,
+        status = value.status,
+        colorMap = value.colorMap,
         createdAt = value.createdAt,
         updatedAt = value.updatedAt
     )
