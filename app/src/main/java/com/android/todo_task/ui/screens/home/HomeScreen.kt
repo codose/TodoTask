@@ -2,6 +2,8 @@ package com.android.todo_task.ui.screens.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -47,7 +49,9 @@ fun HomeScreen() {
         }
     }
 
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .verticalScroll(rememberScrollState())) {
         TopAppBar(title = "Task Tracker")
         Form(
             state = formState,
@@ -83,6 +87,7 @@ fun HomeScreen() {
         Spacer(modifier = Modifier.height(8.dp))
         AnimatedVisibility(visible = allDaySelected.not()) {
             TimeSelector { start, end ->
+                //Todo Time S
             }
         }
         Box(contentAlignment = Alignment.Center) {

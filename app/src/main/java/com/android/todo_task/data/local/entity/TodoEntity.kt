@@ -2,6 +2,7 @@ package com.android.todo_task.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.android.todo_task.domain.ColorMap
 import com.android.todo_task.domain.TaskStatus
 import org.joda.time.DateTime
 
@@ -13,7 +14,7 @@ data class TodoEntity(
     val description: String,
     val validFrom: DateTime,
     val validTo: DateTime,
-    val colorMap: Int,
+    val colorMap: ColorMap,
     val status: TaskStatus,
     val createdAt: DateTime = DateTime.now(),
     val updatedAt: DateTime = DateTime.now()

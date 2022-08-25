@@ -1,5 +1,6 @@
 package com.android.todo_task.ui.screens.home.composable
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +40,7 @@ import com.android.todo_task.ui.theme.TextColor
 import com.himanshoe.kalendar.Kalendar
 import com.himanshoe.kalendar.color.KalendarThemeColor
 import com.himanshoe.kalendar.model.KalendarType
+import java.util.*
 
 @ExperimentalComposeUiApi
 @Composable
@@ -52,18 +55,38 @@ fun DescriptionTextBox(
     onKeyboardAction: ((String) -> Unit)? = null,
     onColorMappedChange: (ColorMap) -> Unit,
     isError: Boolean = false,
-    errorMessage: String = ""
+    errorMessage: String = "",
+    reset: Boolean = true,
+    update: Boolean = true,
+    onReset: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var showPicker by remember {
         mutableStateOf(false)
     }
-    var backgroundColor = ColorMapUtils.getColorForMap(colorMap)
+    var text by remember {
+        mutableStateOf(value)
+    }
+    var backgroundColor by remember {
+        mutableStateOf(ColorMapUtils.getColorForMap(colorMap))
+    }
+
+    SideEffect {
+        if (reset) {
+            text = ""
+            backgroundColor = PrimaryColor
+            onReset.invoke()
+        }
+        if (update) {
+            text = value
+        }
+        onTextChanged(text)
+    }
     Column {
         OutlinedTextField(
             shape = RoundedCornerShape(12.dp),
             singleLine = false,
-            value = value,
+            value = text,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -82,6 +105,7 @@ fun DescriptionTextBox(
             },
             onValueChange = {
                 onTextChanged(it)
+                text = it
             },
             keyboardOptions = KeyboardOptions(imeAction = imeAction, keyboardType = keyboardType),
             keyboardActions = KeyboardActions(
@@ -139,6 +163,7 @@ fun DescriptionTextBox(
                 ColorPicker {
                     backgroundColor = ColorMapUtils.getColorForMap(it)
                     onColorMappedChange.invoke(it)
+                    showPicker = false
                 }
             }
         }
@@ -156,14 +181,30 @@ fun TitleTextBox(
     onTextChanged: (String) -> Unit,
     onKeyboardAction: ((String) -> Unit)? = null,
     isError: Boolean = false,
-    errorMessage: String = ""
+    errorMessage: String = "",
+    reset: Boolean = true,
+    update: Boolean = false,
+    onReset: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    var text by remember {
+        mutableStateOf(value)
+    }
+    SideEffect {
+        if (reset) {
+            text = ""
+            onReset.invoke()
+        }
+        if (update) {
+            text = value
+        }
+        onTextChanged(text)
+    }
     Column {
         OutlinedTextField(
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            value = value,
+            value = text,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -173,6 +214,7 @@ fun TitleTextBox(
             isError = isError,
             modifier = modifier,
             onValueChange = {
+                text = it
                 onTextChanged(it)
             },
             keyboardOptions = KeyboardOptions(imeAction = imeAction, keyboardType = keyboardType),
@@ -253,18 +295,12 @@ fun DaySelector(
             },
             properties = DialogProperties()
         ) {
-            Kalendar(
-                kalendarType = KalendarType.Firey,
-                onCurrentDayClick = { date, event ->
-                    text = date.localDate.toString()
-                    dialogShow = false
-                },
-                kalendarThemeColor = KalendarThemeColor(
-                    backgroundColor = Color.White,
-                    headerTextColor = TextColor,
-                    dayBackgroundColor = PrimaryColor
-                )
-            )
+            DatePicker(onDateSelected = { date ->
+                text = date.toString()
+                dialogShow = false
+            }) {
+                dialogShow = false
+            }
         }
     }
 }
@@ -275,14 +311,25 @@ fun TimeSelector(
     modifier: Modifier = Modifier,
     onRangeSelected: (String, String) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("--:--") }
     var isChecked by remember {
         mutableStateOf(false)
     }
+    val mCalendar = Calendar.getInstance()
+    val mHour = mCalendar[Calendar.HOUR_OF_DAY]
+    val mMinute = mCalendar[Calendar.MINUTE]
+    val context = LocalContext.current
+    // Creating a TimePicker dialog
+    val mTimePickerDialog = TimePickerDialog(
+        context,
+        { _, mHour: Int, mMinute: Int ->
+            text = "$mHour:$mMinute"
+        }, mHour, mMinute, false
+    )
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Icon(imageVector = Icons.Default.Timer, contentDescription = null)
         Spacer(modifier = Modifier.width(24.dp))
-        BorderedText(value = "12:00")
+        TimeSelector()
         Spacer(modifier = Modifier.width(8.dp))
         Divider(
             Modifier
@@ -291,17 +338,46 @@ fun TimeSelector(
             color = TextColor
         )
         Spacer(modifier = Modifier.width(8.dp))
-        BorderedText(value = "13:00")
+        TimeSelector()
         Spacer(modifier = Modifier.weight(1f))
         BorderedText(value = "1:00hrs", backgroundColor = LightPink)
     }
 }
 
 @Composable
-fun BorderedText(value: String, backgroundColor: Color = Color.Transparent) {
+fun TimeSelector() {
+    var text by remember { mutableStateOf("--:--") }
+    val mCalendar = Calendar.getInstance()
+    val mHour = mCalendar[Calendar.HOUR_OF_DAY]
+    val mMinute = mCalendar[Calendar.MINUTE]
+    val context = LocalContext.current
+    // Creating a TimePicker dialog
+    val mTimePickerDialog = TimePickerDialog(
+        context,
+        { _, mHour: Int, mMinute: Int ->
+            var minute = "$mMinute"
+            if (mMinute < 10) {
+                minute = "0$minute"
+            }
+            text = "$mHour:$minute"
+        }, mHour, mMinute, false
+    )
+    BorderedText(value = text) {
+        mTimePickerDialog.show()
+    }
+
+}
+
+@Composable
+fun BorderedText(
+    value: String,
+    backgroundColor: Color = Color.Transparent,
+    onClick: (() -> Unit)? = null
+) {
     Box(
         modifier = Modifier
             .background(backgroundColor, shape = RoundedCornerShape(8.dp))
+            .clickable { onClick?.invoke() }
             .border(border = BorderStroke(2.dp, TextColor), shape = RoundedCornerShape(8.dp))
             .defaultMinSize(minWidth = 56.dp)
     ) {

@@ -5,8 +5,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.android.todo_task.ui.theme.TextColor
 
 @Composable
 fun CustomIconButton(icon: ImageVector, onClick: () -> Unit) {
@@ -14,7 +16,8 @@ fun CustomIconButton(icon: ImageVector, onClick: () -> Unit) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
+            tint = TextColor
         )
     }
 }

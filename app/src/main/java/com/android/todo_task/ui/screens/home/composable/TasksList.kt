@@ -31,10 +31,16 @@ fun TasksList(
     onChecked: (TodoModel, Boolean) -> Unit
 
 ) {
-    LazyColumn {
-        items(taskLists) { todoModel ->
-            TaskListItem(todoModel, onDelete, onEdit, onChecked)
-            Spacer(modifier = Modifier.height(4.dp))
+    if (taskLists.isNotEmpty()) {
+        Column {
+            taskLists.forEach {
+                TaskListItem(it, onDelete, onEdit, onChecked)
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
+    } else {
+        Box(modifier = Modifier.padding(16.dp)) {
+            Text(text = "No Task Found", color = TextColor)
         }
     }
 }
@@ -58,6 +64,9 @@ fun TaskListItem(
         ) {
             var isChecked by remember {
                 mutableStateOf(false)
+            }
+            SideEffect {
+                isChecked = todoModel.status == TaskStatus.Completed
             }
             Checkbox(
                 checked = isChecked,

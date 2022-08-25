@@ -10,7 +10,7 @@ interface TodoDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTodo(todoEntity: TodoEntity)
 
-    @Query("SELECT * FROM todo_entity where status = status")
+    @Query("SELECT * FROM todo_entity where status = :status")
     fun getTodos(status: TaskStatus): Flow<List<TodoEntity>>
 
     @Delete

@@ -41,19 +41,26 @@ class HomeViewModel @Inject constructor(
     }
 
     fun insertTask(title: String, description: String, colorMap: ColorMap) = viewModelScope.launch {
-        insertTodoUseCase.execute(
-            TodoModel(
-                id = 0,
-                title = title,
-                description = description,
-                colorMap = colorMap,
-                status = TaskStatus.Active,
-                validFrom = DateTime.now(),
-                validTo = DateTime.now().plusDays(5),
-                createdAt = DateTime.now(),
-                updatedAt = DateTime.now()
+        if (_todoModelToUpdate.value == null) {
+            insertTodoUseCase.execute(
+                TodoModel(
+                    id = 0,
+                    title = title,
+                    description = description,
+                    colorMap = colorMap,
+                    status = TaskStatus.Active,
+                    validFrom = DateTime.now(),
+                    validTo = DateTime.now().plusDays(5),
+                    createdAt = DateTime.now(),
+                    updatedAt = DateTime.now()
+                )
             )
-        )
+        } else {
+            _todoModelToUpdate.value?.copy(title = title, description =  description, colorMap = colorMap)
+                ?.let { updateTodoUseCase.execute(it) }
+            _todoModelToUpdate.value = null
+        }
+
     }
 
     fun deleteTodo(todoModel: TodoModel) = viewModelScope.launch {
@@ -65,6 +72,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun markAsCompleted(todoModel: TodoModel) = viewModelScope.launch {
-        updateTodoUseCase.execute(todoModel.copy(status = TaskStatus.Active))
+        updateTodoUseCase.execute(todoModel.copy(status = TaskStatus.Completed))
     }
 }

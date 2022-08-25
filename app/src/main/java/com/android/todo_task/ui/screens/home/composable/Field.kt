@@ -1,10 +1,7 @@
 package com.android.todo_task.ui.screens.home.composable
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -27,14 +24,18 @@ class Field(
     var lbl: String by mutableStateOf(label)
     var hasError: Boolean by mutableStateOf(false)
     var colorMap: ColorMap by mutableStateOf(ColorMap.Green)
+    var reset: Boolean by mutableStateOf(false)
+    var update: Boolean by mutableStateOf(false)
 
     fun clear() {
-        text = ""
+        reset = true
+        update = false
     }
 
     fun update(newText: String, colorMap: ColorMap = ColorMap.Green) {
         text = newText
         this.colorMap = colorMap
+        update = true
     }
 
     private fun showError(error: String) {
@@ -64,8 +65,14 @@ class Field(
             errorMessage = lbl,
             onColorMappedChange = {
                 colorMap = it
-            }
+            },
+            reset = reset,
+            onReset = {
+                reset = false
+            },
+            update = update
         )
+        update = false
     }
 
     @Composable
@@ -81,8 +88,14 @@ class Field(
             isError = hasError,
             keyboardType = keyboardType,
             imeAction = imeAction,
-            errorMessage = lbl
+            errorMessage = lbl,
+            onReset = {
+                reset = false
+            },
+            reset = reset,
+            update = update
         )
+        update = false
     }
 
     fun validate(): Boolean {
