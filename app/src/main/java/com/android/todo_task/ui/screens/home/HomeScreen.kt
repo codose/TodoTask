@@ -118,9 +118,12 @@ fun HomeScreen() {
             Modifier.fillMaxWidth(), taskLists,
             onDelete = {
                 viewModel.deleteTodo(it)
+            },
+            onEdit = {
+                viewModel.updateTodo(todoModel = it)
             }
-        ) {
-            viewModel.updateTodo(todoModel = it)
+        ) { todo, _ ->
+            viewModel.markAsCompleted(todoModel = todo)
         }
     }
 }

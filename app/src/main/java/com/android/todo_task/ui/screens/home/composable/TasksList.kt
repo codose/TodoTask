@@ -27,19 +27,31 @@ fun TasksList(
     modifier: Modifier,
     taskLists: List<TodoModel>,
     onDelete: (TodoModel) -> Unit,
-    onEdit: (TodoModel) -> Unit
+    onEdit: (TodoModel) -> Unit,
+    onChecked: (TodoModel, Boolean) -> Unit
+
 ) {
     LazyColumn {
         items(taskLists) { todoModel ->
-            TaskListItem(todoModel, onDelete, onEdit)
+            TaskListItem(todoModel, onDelete, onEdit, onChecked)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
 @Composable
-fun TaskListItem(todoModel: TodoModel, onDelete: (TodoModel) -> Unit, onEdit: (TodoModel) -> Unit) {
-    Box(modifier = Modifier.background(ColorMapUtils.getColorForMap(todoModel.colorMap), shape = RoundedCornerShape(12.dp))) {
+fun TaskListItem(
+    todoModel: TodoModel,
+    onDelete: (TodoModel) -> Unit,
+    onEdit: (TodoModel) -> Unit,
+    onChecked: (TodoModel, Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier.background(
+            ColorMapUtils.getColorForMap(todoModel.colorMap),
+            shape = RoundedCornerShape(12.dp)
+        )
+    ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -50,6 +62,7 @@ fun TaskListItem(todoModel: TodoModel, onDelete: (TodoModel) -> Unit, onEdit: (T
             Checkbox(
                 checked = isChecked,
                 onCheckedChange = {
+                    onChecked(todoModel, it)
                     isChecked = it
                 }
             )
@@ -81,10 +94,11 @@ fun PreviewCompose() {
             validTo = DateTime.now(),
             createdAt = DateTime.now(),
             updatedAt = DateTime.now(),
-            status = TaskStatus.Completed,
+            status = TaskStatus.Active,
             colorMap = ColorMap.Green
         ),
         onDelete = { },
-        onEdit = { }
+        onEdit = { },
+        onChecked = { _, _ -> }
     )
 }

@@ -63,4 +63,8 @@ class HomeViewModel @Inject constructor(
     fun updateTodo(todoModel: TodoModel) {
         _todoModelToUpdate.value = todoModel
     }
+
+    fun markAsCompleted(todoModel: TodoModel) = viewModelScope.launch {
+        updateTodoUseCase.execute(todoModel.copy(status = TaskStatus.Active))
+    }
 }
