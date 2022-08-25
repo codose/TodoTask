@@ -16,13 +16,14 @@ import com.android.todo_task.utils.Validator
 class Field(
     val name: String,
     val label: String = "",
+    val fieldText: String = "",
     val validators: List<Validator>,
     val placeholder: String,
     val imeAction: ImeAction = ImeAction.Done,
     val keyboardType: KeyboardType = KeyboardType.Text,
     val type: FieldType = FieldType.Description
 ) {
-    var text: String by mutableStateOf("")
+    var text: String by mutableStateOf(fieldText)
     var lbl: String by mutableStateOf(label)
     var hasError: Boolean by mutableStateOf(false)
 

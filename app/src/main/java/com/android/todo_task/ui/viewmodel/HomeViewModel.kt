@@ -24,6 +24,8 @@ class HomeViewModel @Inject constructor(
 
     private val _todos = MutableStateFlow<List<TodoModel>>(listOf())
     val todos = _todos.asStateFlow()
+    private val _todoModelToUpdate = MutableStateFlow<TodoModel?>(null)
+    val todoModelToUpdate = _todoModelToUpdate.asStateFlow()
 
     init {
         getTodos()
@@ -55,5 +57,9 @@ class HomeViewModel @Inject constructor(
 
     fun deleteTodo(todoModel: TodoModel) = viewModelScope.launch {
         deleteTodoUseCase.execute(todoModel)
+    }
+
+    fun updateTodo(todoModel: TodoModel) {
+        _todoModelToUpdate.value = todoModel
     }
 }

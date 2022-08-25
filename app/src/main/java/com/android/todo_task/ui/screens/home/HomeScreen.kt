@@ -32,6 +32,7 @@ fun HomeScreen() {
     var allDaySelected by remember {
         mutableStateOf(false)
     }
+    val updateTodo by viewModel.todoModelToUpdate.collectAsState()
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         TopAppBar(title = "Task Tracker")
@@ -42,6 +43,7 @@ fun HomeScreen() {
                 Field(
                     name = TITLE_FIELD, validators = listOf(Required()),
                     label = "",
+                    fieldText = updateTodo?.title.orEmpty(),
                     placeholder = "Title",
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text,
@@ -50,6 +52,7 @@ fun HomeScreen() {
                 Field(
                     name = DESCRIPTION_FIELD, validators = listOf(Required()),
                     label = "",
+                    fieldText = updateTodo?.description.orEmpty(),
                     placeholder = "Task Description",
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Password,
@@ -72,18 +75,20 @@ fun HomeScreen() {
             TimeSelector { start, end ->
             }
         }
-        TextButton(
-            onClick = {
-                if (formState.validate()) {
-                    val data = formState.getData()
-                    val title = formState.getData()[TITLE_FIELD].orEmpty()
-                    val description = formState.getData()[DESCRIPTION_FIELD].orEmpty()
-                    viewModel.insertTask(title, description)
-                    formState.clear()
+        Box(contentAlignment = Alignment.Center) {
+            TextButton(
+                onClick = {
+                    if (formState.validate()) {
+                        val data = formState.getData()
+                        val title = formState.getData()[TITLE_FIELD].orEmpty()
+                        val description = formState.getData()[DESCRIPTION_FIELD].orEmpty()
+                        viewModel.insertTask(title, description)
+                        formState.clear()
+                    }
                 }
+            ) {
+                Text(text = "Save")
             }
-        ) {
-            Text(text = "Save")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -100,6 +105,7 @@ fun HomeScreen() {
                 viewModel.deleteTodo(it)
             }
         ) {
+            viewModel.updateTodo(todoModel = it)
         }
     }
 }
