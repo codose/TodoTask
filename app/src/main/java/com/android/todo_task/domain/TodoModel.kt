@@ -6,7 +6,7 @@ data class TodoModel(
     val id: Long = 0L,
     val title: String,
     val description: String,
-    val colorMap: Int,
+    val colorMap: ColorMap,
     val status: TaskStatus,
     val validFrom: DateTime,
     val validTo: DateTime,
@@ -17,4 +17,11 @@ data class TodoModel(
 enum class TaskStatus {
     Completed,
     Active
+}
+
+enum class ColorMap {
+    Gray,
+    Purple,
+    Pink,
+    Green
 }

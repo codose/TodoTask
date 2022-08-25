@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.android.todo_task.domain.ColorMap
+import com.android.todo_task.ui.screens.home.ColorMapUtils
 import com.android.todo_task.ui.theme.LightPink
 import com.android.todo_task.ui.theme.PrimaryColor
 import com.android.todo_task.ui.theme.TextColor
@@ -44,13 +46,19 @@ fun DescriptionTextBox(
     value: String = "",
     placeholder: String,
     imeAction: ImeAction = ImeAction.Done,
+    colorMap: ColorMap,
     keyboardType: KeyboardType = KeyboardType.Text,
     onTextChanged: (String) -> Unit,
     onKeyboardAction: ((String) -> Unit)? = null,
+    onColorMappedChange: (ColorMap) -> Unit,
     isError: Boolean = false,
     errorMessage: String = ""
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    var showPicker by remember {
+        mutableStateOf(false)
+    }
+    var backgroundColor = ColorMapUtils.getColorForMap(colorMap)
     Column {
         OutlinedTextField(
             shape = RoundedCornerShape(12.dp),
@@ -59,7 +67,7 @@ fun DescriptionTextBox(
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
-                backgroundColor = PrimaryColor,
+                backgroundColor = backgroundColor,
                 textColor = TextColor
             ),
             isError = isError,
@@ -88,7 +96,7 @@ fun DescriptionTextBox(
             Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .background(shape = RoundedCornerShape(12.dp), color = PrimaryColor),
+                .background(shape = RoundedCornerShape(12.dp), color = backgroundColor),
             contentAlignment = Alignment.CenterStart
         ) {
             Row(
@@ -102,6 +110,7 @@ fun DescriptionTextBox(
                 CustomIconButton(Icons.Outlined.Notifications) {
                 }
                 CustomIconButton(Icons.Outlined.Palette) {
+                    showPicker = true
                 }
                 CustomIconButton(Icons.Outlined.Download) {
                 }
@@ -123,6 +132,15 @@ fun DescriptionTextBox(
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier.padding(start = 16.dp)
             )
+        }
+
+        if (showPicker) {
+            Dialog(onDismissRequest = { showPicker = false }) {
+                ColorPicker {
+                    backgroundColor = ColorMapUtils.getColorForMap(it)
+                    onColorMappedChange.invoke(it)
+                }
+            }
         }
     }
 }

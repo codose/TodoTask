@@ -15,9 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.android.todo_task.domain.ColorMap
 import com.android.todo_task.domain.TaskStatus
 import com.android.todo_task.domain.TodoModel
-import com.android.todo_task.ui.theme.LightPink
+import com.android.todo_task.ui.screens.home.ColorMapUtils
 import com.android.todo_task.ui.theme.TextColor
 import org.joda.time.DateTime
 
@@ -38,7 +39,7 @@ fun TasksList(
 
 @Composable
 fun TaskListItem(todoModel: TodoModel, onDelete: (TodoModel) -> Unit, onEdit: (TodoModel) -> Unit) {
-    Box(modifier = Modifier.background(LightPink, shape = RoundedCornerShape(12.dp))) {
+    Box(modifier = Modifier.background(ColorMapUtils.getColorForMap(todoModel.colorMap), shape = RoundedCornerShape(12.dp))) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -81,7 +82,7 @@ fun PreviewCompose() {
             createdAt = DateTime.now(),
             updatedAt = DateTime.now(),
             status = TaskStatus.Completed,
-            colorMap = 1
+            colorMap = ColorMap.Green
         ),
         onDelete = { },
         onEdit = { }

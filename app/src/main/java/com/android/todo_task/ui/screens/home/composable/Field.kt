@@ -9,6 +9,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.android.todo_task.domain.ColorMap
 import com.android.todo_task.utils.Required
 import com.android.todo_task.utils.Validator
 
@@ -16,19 +17,24 @@ import com.android.todo_task.utils.Validator
 class Field(
     val name: String,
     val label: String = "",
-    val fieldText: String = "",
     val validators: List<Validator>,
     val placeholder: String,
     val imeAction: ImeAction = ImeAction.Done,
     val keyboardType: KeyboardType = KeyboardType.Text,
     val type: FieldType = FieldType.Description
 ) {
-    var text: String by mutableStateOf(fieldText)
+    var text: String by mutableStateOf("")
     var lbl: String by mutableStateOf(label)
     var hasError: Boolean by mutableStateOf(false)
+    var colorMap: ColorMap by mutableStateOf(ColorMap.Green)
 
     fun clear() {
         text = ""
+    }
+
+    fun update(newText: String, colorMap: ColorMap = ColorMap.Green) {
+        text = newText
+        this.colorMap = colorMap
     }
 
     private fun showError(error: String) {
@@ -45,6 +51,7 @@ class Field(
     fun Content() {
         DescriptionTextBox(
             value = text,
+            colorMap = colorMap,
             modifier = Modifier.fillMaxWidth(),
             placeholder = placeholder,
             onTextChanged = {
@@ -54,7 +61,10 @@ class Field(
             isError = hasError,
             keyboardType = keyboardType,
             imeAction = imeAction,
-            errorMessage = lbl
+            errorMessage = lbl,
+            onColorMappedChange = {
+                colorMap = it
+            }
         )
     }
 

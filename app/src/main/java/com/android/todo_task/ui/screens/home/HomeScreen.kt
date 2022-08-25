@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.android.todo_task.domain.ColorMap
 import com.android.todo_task.ui.screens.home.composable.*
 import com.android.todo_task.ui.theme.TextColor
 import com.android.todo_task.ui.viewmodel.HomeViewModel
@@ -33,17 +34,27 @@ fun HomeScreen() {
         mutableStateOf(false)
     }
     val updateTodo by viewModel.todoModelToUpdate.collectAsState()
+    val formState by remember { mutableStateOf(FormState()) }
+
+    LaunchedEffect(key1 = updateTodo) {
+        updateTodo?.let {
+            formState.update(
+                listOf(
+                    Triple(FieldType.Description, it.description, it.colorMap),
+                    Triple(FieldType.Title, it.title, it.colorMap)
+                )
+            )
+        }
+    }
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         TopAppBar(title = "Task Tracker")
-        val formState by remember { mutableStateOf(FormState()) }
         Form(
             state = formState,
             fields = listOf(
                 Field(
                     name = TITLE_FIELD, validators = listOf(Required()),
                     label = "",
-                    fieldText = updateTodo?.title.orEmpty(),
                     placeholder = "Title",
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text,
@@ -52,7 +63,6 @@ fun HomeScreen() {
                 Field(
                     name = DESCRIPTION_FIELD, validators = listOf(Required()),
                     label = "",
-                    fieldText = updateTodo?.description.orEmpty(),
                     placeholder = "Task Description",
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Password,
@@ -80,9 +90,14 @@ fun HomeScreen() {
                 onClick = {
                     if (formState.validate()) {
                         val data = formState.getData()
-                        val title = formState.getData()[TITLE_FIELD].orEmpty()
-                        val description = formState.getData()[DESCRIPTION_FIELD].orEmpty()
-                        viewModel.insertTask(title, description)
+                        val title = (formState.getData()[TITLE_FIELD] as? String).orEmpty()
+                        val description = (formState.getData()[DESCRIPTION_FIELD]) as? Pair<*, *>
+
+                        viewModel.insertTask(
+                            title = title,
+                            description = (description?.first as? String).orEmpty(),
+                            colorMap = (description?.second as? ColorMap) ?: ColorMap.Green
+                        )
                         formState.clear()
                     }
                 }

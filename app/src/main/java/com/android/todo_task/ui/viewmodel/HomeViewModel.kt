@@ -2,6 +2,7 @@ package com.android.todo_task.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.todo_task.domain.ColorMap
 import com.android.todo_task.domain.TaskStatus
 import com.android.todo_task.domain.TodoModel
 import com.android.todo_task.domain.usecase.*
@@ -39,13 +40,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun insertTask(title: String, description: String) = viewModelScope.launch {
+    fun insertTask(title: String, description: String, colorMap: ColorMap) = viewModelScope.launch {
         insertTodoUseCase.execute(
             TodoModel(
                 id = 0,
                 title = title,
                 description = description,
-                colorMap = 0,
+                colorMap = colorMap,
                 status = TaskStatus.Active,
                 validFrom = DateTime.now(),
                 validTo = DateTime.now().plusDays(5),
