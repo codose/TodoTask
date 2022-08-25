@@ -2,6 +2,7 @@ package com.android.todo_task.data.repository
 
 import com.android.todo_task.data.local.dao.TodoDao
 import com.android.todo_task.data.local.entity.TodoEntity
+import com.android.todo_task.domain.TaskStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ interface TodoLocalRepository {
 class TodoLocalRepositoryImpl @Inject constructor(
     private val todoDao: TodoDao
 ) : TodoLocalRepository {
-    override fun getTodos(): Flow<List<TodoEntity>> = todoDao.getTodos()
+    override fun getTodos(): Flow<List<TodoEntity>> = todoDao.getTodos(TaskStatus.Active)
 
     override suspend fun insertTodo(todoEntity: TodoEntity) = todoDao.insertTodo(todoEntity)
 
