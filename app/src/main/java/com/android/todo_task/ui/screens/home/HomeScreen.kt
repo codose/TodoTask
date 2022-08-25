@@ -1,8 +1,10 @@
 package com.android.todo_task.ui.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.runtime.*
@@ -27,6 +29,9 @@ private const val DESCRIPTION_FIELD = "DESCRIPTION_FIELD"
 fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
     val taskLists by viewModel.todos.collectAsState()
+    var allDaySelected by remember {
+        mutableStateOf(false)
+    }
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         TopAppBar(title = "Task Tracker")
@@ -52,14 +57,35 @@ fun HomeScreen() {
                 )
             )
         )
-        DaySelector(onDayChanged = {}, onAllDaySelected = {})
+        DaySelector(
+            onDayChanged = {},
+            onAllDaySelected = {
+                allDaySelected = it
+            }
+        )
         Spacer(modifier = Modifier.height(4.dp))
-        Box(Modifier.padding(start = 24.dp)) {
+        Box(Modifier.padding(start = 0.dp)) {
             ItemSelector(values = listOf("Does not repeat"))
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        TimeSelector { start, end ->
+        Spacer(modifier = Modifier.height(8.dp))
+        AnimatedVisibility(visible = allDaySelected.not()) {
+            TimeSelector { start, end ->
+            }
         }
+        TextButton(
+            onClick = {
+                if (formState.validate()) {
+                    val data = formState.getData()
+                    val title = formState.getData()[TITLE_FIELD].orEmpty()
+                    val description = formState.getData()[DESCRIPTION_FIELD].orEmpty()
+                    viewModel.insertTask(title, description)
+                    formState.clear()
+                }
+            }
+        ) {
+            Text(text = "Save")
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -68,6 +94,12 @@ fun HomeScreen() {
             Icon(imageVector = Icons.Outlined.Sort, contentDescription = null)
         }
 
-        TasksList(Modifier.fillMaxWidth(), taskLists)
+        TasksList(
+            Modifier.fillMaxWidth(), taskLists,
+            onDelete = {
+                viewModel.deleteTodo(it)
+            }
+        ) {
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.android.todo_task.ui.screens.home.composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
@@ -21,13 +22,22 @@ import com.android.todo_task.ui.theme.TextColor
 import org.joda.time.DateTime
 
 @Composable
-fun TasksList(modifier: Modifier, taskLists: List<TodoModel>) {
+fun TasksList(
+    modifier: Modifier,
+    taskLists: List<TodoModel>,
+    onDelete: (TodoModel) -> Unit,
+    onEdit: (TodoModel) -> Unit
+) {
     LazyColumn {
+        items(taskLists) { todoModel ->
+            TaskListItem(todoModel, onDelete, onEdit)
+            Spacer(modifier = Modifier.height(4.dp))
+        }
     }
 }
 
 @Composable
-fun TaskListItem(todoModel: TodoModel) {
+fun TaskListItem(todoModel: TodoModel, onDelete: (TodoModel) -> Unit, onEdit: (TodoModel) -> Unit) {
     Box(modifier = Modifier.background(LightPink, shape = RoundedCornerShape(12.dp))) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -49,8 +59,10 @@ fun TaskListItem(todoModel: TodoModel) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             CustomIconButton(icon = Icons.Outlined.Edit) {
+                onEdit(todoModel)
             }
             CustomIconButton(icon = Icons.Outlined.Delete) {
+                onDelete(todoModel)
             }
         }
     }
@@ -70,6 +82,8 @@ fun PreviewCompose() {
             updatedAt = DateTime.now(),
             status = TaskStatus.Completed,
             colorMap = 1
-        )
+        ),
+        onDelete = { },
+        onEdit = { }
     )
 }

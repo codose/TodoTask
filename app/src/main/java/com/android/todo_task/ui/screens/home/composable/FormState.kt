@@ -16,4 +16,6 @@ class FormState {
     }
 
     fun getData(): Map<String, String> = fields.associate { it.name to it.text }
+
+    fun clear() = fields.forEach { it.clear() }
 }

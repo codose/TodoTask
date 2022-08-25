@@ -2,6 +2,7 @@ package com.android.todo_task.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.todo_task.domain.TaskStatus
 import com.android.todo_task.domain.TodoModel
 import com.android.todo_task.domain.usecase.*
 import com.android.todo_task.utils.DispatcherProvider
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,5 +35,25 @@ class HomeViewModel @Inject constructor(
                 _todos.value = it
             }
         }
+    }
+
+    fun insertTask(title: String, description: String) = viewModelScope.launch {
+        insertTodoUseCase.execute(
+            TodoModel(
+                id = 0,
+                title = title,
+                description = description,
+                colorMap = 0,
+                status = TaskStatus.Active,
+                validFrom = DateTime.now(),
+                validTo = DateTime.now().plusDays(5),
+                createdAt = DateTime.now(),
+                updatedAt = DateTime.now()
+            )
+        )
+    }
+
+    fun deleteTodo(todoModel: TodoModel) = viewModelScope.launch {
+        deleteTodoUseCase.execute(todoModel)
     }
 }

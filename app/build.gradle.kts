@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
 
     lint {
         abortOnError = false
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId = "com.android.todo_task"
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
 
@@ -104,6 +104,7 @@ dependencies {
     implementation(Room.roomKtx)
     kapt(Room.roomKapt)
     implementation(Joda.jodaTime)
+    implementation(Calendar.kalendar)
 }
 
 jacoco {

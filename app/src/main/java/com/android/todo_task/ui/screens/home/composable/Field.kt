@@ -1,11 +1,9 @@
 package com.android.todo_task.ui.screens.home.composable
 
-import android.util.Patterns
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,16 +42,12 @@ class Field(
 
     @Composable
     fun Content() {
-        var textEdit by remember {
-            mutableStateOf("")
-        }
-        text = textEdit
         DescriptionTextBox(
             value = text,
             modifier = Modifier.fillMaxWidth(),
             placeholder = placeholder,
             onTextChanged = {
-                textEdit = it
+                text = it
                 hideError()
             },
             isError = hasError,
@@ -65,16 +59,12 @@ class Field(
 
     @Composable
     fun ContentTitle() {
-        var textEdit by remember {
-            mutableStateOf("")
-        }
-        text = textEdit
         TitleTextBox(
             value = text,
             modifier = Modifier.fillMaxWidth(),
             placeholder = placeholder,
             onTextChanged = {
-                textEdit = it
+                text = it
                 hideError()
             },
             isError = hasError,
@@ -88,7 +78,7 @@ class Field(
         return validators.map {
             when (it) {
                 is Required -> {
-                    if (!Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+                    if (text.isEmpty()) {
                         showError(it.message)
                         return@map false
                     }

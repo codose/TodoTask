@@ -3,6 +3,7 @@ package com.android.todo_task.ui.screens.home.composable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,9 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.android.todo_task.ui.theme.LightPink
 import com.android.todo_task.ui.theme.PrimaryColor
 import com.android.todo_task.ui.theme.TextColor
+import com.himanshoe.kalendar.Kalendar
+import com.himanshoe.kalendar.color.KalendarThemeColor
+import com.himanshoe.kalendar.model.KalendarType
 
 @ExperimentalComposeUiApi
 @Composable
@@ -44,14 +50,12 @@ fun DescriptionTextBox(
     isError: Boolean = false,
     errorMessage: String = ""
 ) {
-    val text = remember { mutableStateOf(value) }
-    val passwordVisibility = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         OutlinedTextField(
             shape = RoundedCornerShape(12.dp),
             singleLine = false,
-            value = text.value,
+            value = value,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -70,13 +74,12 @@ fun DescriptionTextBox(
             },
             onValueChange = {
                 onTextChanged(it)
-                text.value = it
             },
             keyboardOptions = KeyboardOptions(imeAction = imeAction, keyboardType = keyboardType),
             keyboardActions = KeyboardActions(
                 onAny = {
                     keyboardController?.hide()
-                    onKeyboardAction?.invoke(text.value)
+                    onKeyboardAction?.invoke(value)
                 }
             )
         )
@@ -137,13 +140,12 @@ fun TitleTextBox(
     isError: Boolean = false,
     errorMessage: String = ""
 ) {
-    val text = remember { mutableStateOf(value) }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         OutlinedTextField(
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            value = text.value,
+            value = value,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -154,17 +156,16 @@ fun TitleTextBox(
             modifier = modifier,
             onValueChange = {
                 onTextChanged(it)
-                text.value = it
             },
             keyboardOptions = KeyboardOptions(imeAction = imeAction, keyboardType = keyboardType),
             keyboardActions = KeyboardActions(
                 onAny = {
                     keyboardController?.hide()
-                    onKeyboardAction?.invoke(text.value)
+                    onKeyboardAction?.invoke(value)
                 }
             ),
             textStyle = TextStyle(
-                fontSize = 25.sp,
+                fontSize = 20.sp,
                 textAlign = TextAlign.Start
             ),
             placeholder = {
@@ -198,14 +199,22 @@ fun DaySelector(
     onDayChanged: (String) -> Unit,
     onAllDaySelected: (Boolean) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("Select a day") }
+    var dialogShow by remember {
+        mutableStateOf(false)
+    }
     var isChecked by remember {
         mutableStateOf(false)
     }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Icon(imageVector = Icons.Default.Timer, contentDescription = null)
         Spacer(modifier = Modifier.width(24.dp))
-        Text(text = text, fontSize = 16.sp)
+        Text(
+            text = text, fontSize = 14.sp,
+            modifier = Modifier.clickable {
+                dialogShow = true
+            }
+        )
         Spacer(modifier = Modifier.weight(1f))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "All Day", fontSize = 16.sp)
@@ -216,6 +225,27 @@ fun DaySelector(
                     onAllDaySelected.invoke(it)
                     isChecked = it
                 }
+            )
+        }
+    }
+    if (dialogShow) {
+        Dialog(
+            onDismissRequest = {
+                dialogShow = false
+            },
+            properties = DialogProperties()
+        ) {
+            Kalendar(
+                kalendarType = KalendarType.Firey,
+                onCurrentDayClick = { date, event ->
+                    text = date.localDate.toString()
+                    dialogShow = false
+                },
+                kalendarThemeColor = KalendarThemeColor(
+                    backgroundColor = Color.White,
+                    headerTextColor = TextColor,
+                    dayBackgroundColor = PrimaryColor
+                )
             )
         }
     }
@@ -253,11 +283,11 @@ fun TimeSelector(
 fun BorderedText(value: String, backgroundColor: Color = Color.Transparent) {
     Box(
         modifier = Modifier
-            .background(backgroundColor, shape = RoundedCornerShape(12.dp))
-            .border(border = BorderStroke(2.dp, TextColor), shape = RoundedCornerShape(12.dp))
+            .background(backgroundColor, shape = RoundedCornerShape(8.dp))
+            .border(border = BorderStroke(2.dp, TextColor), shape = RoundedCornerShape(8.dp))
             .defaultMinSize(minWidth = 56.dp)
     ) {
-        Text(text = value, modifier = Modifier.padding(16.dp))
+        Text(text = value, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
     }
 }
 
@@ -268,11 +298,14 @@ fun ItemSelector(values: List<String>) {
     ) {
         Text(
             text = if (values.isNotEmpty()) values.first() else "No Items",
-            modifier = Modifier.padding(16.dp),
             color = TextColor
         )
         Spacer(modifier = Modifier.width(4.dp))
-        Icon(imageVector = Icons.Outlined.ChevronRight, modifier = Modifier.rotate(90.0f), contentDescription = null)
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            modifier = Modifier.rotate(90.0f),
+            contentDescription = null
+        )
     }
 }
 
